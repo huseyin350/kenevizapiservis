@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Keneviz VIP Robot Doğrulama</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+    :root{
+      --gold:#ffd700;
+      --gold-soft:#ffea00;
+      --bg1:#000;
+      --bg2:#111;
+      --bg3:#1b1b1b;
+      --green:#32cd32;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg2));
+      background-size: 400% 400%;
+      animation: bgMove 12s ease infinite;
+      display:flex; align-items:center; justify-content:center;
+      font-family:"Orbitron",system-ui,Segoe UI,Arial;
+      color:var(--gold);
+      overflow:hidden;
+      user-select:none;
+    }
+    @keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    .card{
+      width:min(92vw,720px);
+      padding:34px 28px 28px;
+      border-radius:28px;
+      background: rgba(20,20,20,.55);
+      backdrop-filter: blur(12px);
+      border:2px solid var(--gold);
+      box-shadow:0 0 44px rgba(255,215,0,.45), inset 0 0 18px rgba(255,215,0,.12);
+      text-align:center;
+    }
+    .title{
+      margin:0 0 18px;
+      font-size:26px;
+      letter-spacing:.5px;
+      text-shadow:0 0 12px var(--gold),0 0 24px var(--gold-soft);
+    }
+
+    /* ===== VIP Doğrulama Çubuğu (uzun ve enli) ===== */
+    .verify-bar{
+      width:min(92vw,620px);
+      height:120px;
+      margin:12px auto 8px;
+      border-radius:999px;
+      position:relative;
+      padding-left:160px; /* soldaki yuvarlağa alan */
+      display:flex; align-items:center; justify-content:flex-start;
+      background: linear-gradient(135deg, rgba(255,215,0,.12), rgba(255,215,0,.02));
+      border:1.5px solid var(--gold);
+      box-shadow:
+        0 0 26px rgba(255,215,0,.28),
+        inset 0 0 20px rgba(255,215,0,.08);
+      cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      overflow:hidden;
+      isolation:isolate;
+    }
+    .verify-bar:hover{ transform: translateY(-2px); box-shadow:0 0 38px rgba(255,215,0,.38), inset 0 0 26px rgba(255,215,0,.10) }
+    .verify-bar:active{ transform: translateY(0) scale(.995) }
+
+    /* Parıltı şeridi */
+    .sheen{
+      position:absolute; inset:0; z-index:0;
+      background: linear-gradient(110deg, transparent 10%, rgba(255,255,255,.08) 25%, transparent 40%);
+      transform: translateX(-100%);
+      animation: sheen 3.6s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes sheen{
+      0%{transform: translateX(-110%)}
+      55%{transform: translateX(110%)}
+      100%{transform: translateX(110%)}
+    }
+
+    /* İç yuvarlak (küçültülmüş) */
+    .circle-wrap{
+      position:absolute; left:18px; top:50%; transform:translateY(-50%);
+      width:120px; height:120px; border-radius:50%;
+      display:grid; place-items:center;
+      background: radial-gradient(circle at 35% 25%, #333 0%, #111 55%, #000 100%);
+      border:2px solid var(--gold);
+      box-shadow:0 0 22px rgba(255,215,0,.35), inset 0 0 16px rgba(255,215,0,.1);
+      overflow:hidden;
+      z-index:1;
+    }
+    .circle-wrap::after{
+      /* dış altın döngü aurası */
+      content:""; position:absolute; inset:-45%;
+      background: conic-gradient(var(--gold), transparent, var(--gold));
+      opacity:.22; border-radius:50%;
+      animation: spin 3s linear infinite;
+    }
+
+    .circle-btn{
+      position:relative; z-index:2;
+      width:98px; height:98px; border-radius:50%;
+      display:grid; place-items:center;
+      border:2px solid var(--gold);
+      background: radial-gradient(circle at 35% 25%, #444 0%, #111 60%, #000 100%);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .circle-btn:hover{ transform:scale(1.03); box-shadow:0 0 18px rgba(255,215,0,.35) }
+
+    .btn-text{ font-size:28px; color:var(--gold); text-shadow:0 0 10px var(--gold) }
+
+    .ring{
+      position:absolute;
+      width:84px; height:84px; border-radius:50%;
+      border:6px solid transparent; border-top-color: var(--green);
+      display:none; animation: spin 1s linear infinite;
+      filter: drop-shadow(0 0 8px rgba(50,205,50,.55));
+    }
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Çubuk içi metinler */
+    .bar-content{
+      position:relative; z-index:1;
+      display:flex; flex-direction:column; gap:6px;
+      padding-right:24px;
+    }
+    .bar-title{
+      font-size:18px; line-height:1;
+      color:var(--gold); text-shadow:0 0 8px var(--gold);
+      text-align:left;
+    }
+    .bar-sub{
+      font-size:14px; color:#d9d199; opacity:.9; text-align:left;
+      min-height:18px;
+    }
+
+    .status{
+      margin-top:16px; min-height:28px;
+      font-size:18px; font-weight:700; color:var(--gold-soft);
+      text-shadow:0 0 10px var(--gold-soft);
+    }
+
+    /* Mobil uyum */
+    @media (max-width:560px){
+      .verify-bar{ height:108px; padding-left:140px }
+      .circle-wrap{ width:108px; height:108px; left:12px }
+      .circle-btn{ width:88px; height:88px }
+      .ring{ width:76px; height:76px }
+      .bar-title{ font-size:16px }
+      .bar-sub{ font-size:13px }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h2 class="title">👑 Keneviz VIP Robot Doğrulama</h2>
+
+    <!-- Uzun enli doğrulama çubuğu -->
+    <div class="verify-bar" id="verifyBar" role="button" aria-label="Robot doğrulama başlat">
+      <div class="sheen" aria-hidden="true"></div>
+
+      <!-- Solda küçük yuvarlak -->
+      <div class="circle-wrap">
+        <div class="circle-btn" id="circleBtn">
+          <span class="btn-text" id="btnText">✔</span>
+          <div class="ring" id="ring"></div>
+        </div>
+      </div>
+
+      <!-- Çubuk içi metinler -->
+      <div class="bar-content">
+        <div class="bar-title" id="barTitle">Robot doğrulaması gerekiyor</div>
+        <div class="bar-sub" id="barSub">Devam etmek için çubuğa tıklayın</div>
+      </div>
+    </div>
+
+    <div class="status" id="statusText">Lütfen doğrulamak için tıklayın</div>
+  </main>
+
+  <script>
+    const verifyBar = document.getElementById("verifyBar");
+    const circleBtn = document.getElementById("circleBtn");
+    const btnText   = document.getElementById("btnText");
+    const ring      = document.getElementById("ring");
+    const statusEl  = document.getElementById("statusText");
+    const barTitle  = document.getElementById("barTitle");
+    const barSub    = document.getElementById("barSub");
+
+    let verifying = false;
+
+    function startUI(){
+      btnText.style.display = "none";
+      ring.style.display = "block";
+      statusEl.textContent = "🔍 Derin yoklama başlatılıyor...";
+      barTitle.textContent = "Derin yoklama aktif";
+      barSub.textContent = "Sistem imza ve davranış analizi çalışıyor…";
+    }
+
+    function stepMessages(){
+      setTimeout(()=>{ statusEl.textContent = "⚡ Sistem kontrol ediliyor..."; barSub.textContent="Cihaz ve ağ parmak izi toplanıyor…"; }, 3000);
+      setTimeout(()=>{ statusEl.textContent = "🔐 Ek güvenlik sorgusu yapılıyor..."; barSub.textContent="IP ve istek tutarlılığı kontrolü…"; }, 6000);
+    }
+
+    function finishUI(){
+      ring.style.display = "none";
+      btnText.style.display = "block";
+      btnText.textContent = "✅";
+      statusEl.textContent = "👑 Başarıyla doğrulandı! Yönlendiriliyor…";
+      barTitle.textContent = "Doğrulama tamamlandı";
+      barSub.textContent = "Erişim izni verildi";
+    }
+
+    async function verifyAndRedirect(){
+      try{
+        await fetch("/verify_robot", { method:"POST", headers:{ "X-Requested-With":"fetch" } });
+        window.location.href = "/";
+      }catch(e){
+        statusEl.textContent = "❗ Doğrulama isteği başarısız oldu. Lütfen yenileyin.";
+      }
+    }
+
+    function runProcess(){
+      if (verifying) return;
+      verifying = true;
+      startUI();
+      stepMessages();
+
+      // Toplam 9sn simülasyon, sonra session set + yönlendirme
+      setTimeout(()=>{
+        finishUI();
+        setTimeout(verifyAndRedirect, 1200); // minik bekleme sonra POST + redirect
+      }, 9000);
+    }
+
+    // Hem çubuk hem içteki yuvarlak tıklanabilir
+    verifyBar.addEventListener("click", runProcess);
+    circleBtn.addEventListener("click", (e)=>{ e.stopPropagation(); runProcess(); });
+
+    /* ==== F12 / Sağ tık / Inspect engelleme ==== */
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("keydown", e => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
+        (e.ctrlKey && (e.key === "U" || e.key === "S")) // Ctrl+U / Ctrl+S
+      ){
+        e.preventDefault(); e.stopPropagation();
+      }
+    }, true);
+  </script>
+</body>
+</html>
